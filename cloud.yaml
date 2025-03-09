@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Setup Ubuntu Server with a Docker container and predefined Security Group. 
+
+Resources:
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for SSH, HTTP, and HTTPS access
+      VpcId : vpc-0a31ece3c7e387a5a # my vpc id
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0  # allows SSH access from anywere
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0  # allow HTTP access from anywere
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0  # allow HTTP access from anwere
+
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-04b4f1a9cf54c11d0 # AMI id in your region
+      KeyName: mykey #key pair name 
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
+      SubnetId: subnet-0d6821f18764ac384 # subnet id
+      
+Outputs:
+  InstanceId:
+    Description: "The Instance ID if the EC2 instance"
+    Value: !Ref MyEC2Instance
+  PublicIp:
+    Description: "Public IP address of the new EC2 instance"
+    Value: !GetAtt MyEC2Instance.PublicIp
+  PublicDNS:
+    Description: "Public DNS of the new EC2 instance"
+    Value: !GetAtt MyEC2Instance.PublicDnsName
+
+
+
+      
